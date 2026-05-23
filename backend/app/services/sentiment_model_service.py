@@ -8,10 +8,14 @@ import tensorflow as tf
 import emoji
 from googletrans import Translator
 from sqlalchemy.ext.asyncio import AsyncSession
-from tensorflow.keras.datasets import imdb
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Embedding, LSTM, Dense
+from tensorflow.keras import datasets, layers, models, preprocessing
+imdb = datasets.imdb
+pad_sequences = preprocessing.sequence.pad_sequences
+Sequential = models.Sequential
+load_model = models.load_model
+Embedding = layers.Embedding
+LSTM = layers.LSTM
+Dense = layers.Dense
 
 from app.models.models import Post, SentimentRecord
 
@@ -97,18 +101,42 @@ class SentimentModelService:
 
     def analyze_sentiment(self, text: str):
         try:
-            # Expanded keyword lists
-            POSITIVE_KEYS = ["congrats", "congratulations", "proud", "galing", "lodi", "idol", "good", "great", "best", "amazing", "wow", "happy", "love", "dasurv", "deserve", "panalo", "nice", "keep it up", "suwerte", "blessed"]
-            NEGATIVE_KEYS = ["bad", "worst", "fail", "sad", "disappoint", "mali", "panget", "galit", "bulok", "talo", "sayang", "tambak", "corny", "fake"]
+            # Expanded keyword lists with Tagalog and English slang
+            POSITIVE_KEYS = [
+                "congrats", "congratulations", "proud", "galing", "lodi", "idol", "good", "great", "best", "amazing", "wow", 
+                "happy", "love", "dasurv", "deserve", "panalo", "nice", "keep it up", "suwerte", "blessed", "petmalu", 
+                "werpa", "salamat", "thank", "thanks", "hope", "faith", "strong", "inspire", "inspiring"
+            ]
+            NEGATIVE_KEYS = [
+                "bad", "worst", "fail", "sad", "disappoint", "mali", "panget", "galit", "bulok", "talo", "sayang", "tambak", 
+                "corny", "fake", "bobo", "tanga", "gago", "puta", "pakshet", "basura", "patapon", "kupal", "hayop", "salot", 
+                "trauma", "scam", "kadiri", "nandidiri", "pwe", "eww", "baliw", "siraulo", "mamatay", "kulong", "criminal", 
+                "kriminal", "magnanakaw", "kurakot", "abuso", "abusado", "takot", "panganib", "pdf file", "pedophile", 
+                "predator", "creep", "stupid", "idiot", "trash", "garbage", "scum", "disgusting", "horrible", "terrible", 
+                "arrested", "charged", "crime", "allegation", "allegations", "suspect", "suspects", "guilty", "nakaaresto",
+                "ironic", "irony", "usual suspect", "reveal", "always the", "practice makes perfect", "pano pa", "allegations"
+            ]
 
             text_lower = text.lower()
             
-            # 1. Manual keyword boost (Increased weight)
+            # 1. Manual keyword boost (Balanced weight to avoid excessive stacking)
             boost = 0.0
+            found_negatives = set()
             for k in POSITIVE_KEYS:
-                if k in text_lower: boost += 0.30
+                if k in text_lower: boost += 0.35
+            
             for k in NEGATIVE_KEYS:
-                if k in text_lower: boost -= 0.30
+                if k in text_lower:
+                    # Prevent over-stacking for very similar keywords (e.g., suspect vs usual suspect)
+                    is_subpart = False
+                    for existing in found_negatives:
+                        if k in existing: 
+                            is_subpart = True
+                            break
+                    
+                    if not is_subpart:
+                        boost -= 0.35
+                        found_negatives.add(k)
 
             # 2. Translation & Cleaning
             text_cleaned = emoji.demojize(text, delimiters=(" ", " ")).replace("_", " ")

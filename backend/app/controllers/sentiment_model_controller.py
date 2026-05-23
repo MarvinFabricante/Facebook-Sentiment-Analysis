@@ -34,8 +34,8 @@ async def get_comment_stats(
     """
     Returns total comments and sentiment breakdown.
     """
-    start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=timezone.utc) if start_date else None
-    end = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59, tzinfo=timezone.utc) if end_date else None
+    start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=timezone.utc) if (start_date and start_date.strip()) else None
+    end = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59, tzinfo=timezone.utc) if (end_date and end_date.strip()) else None
     stats = await sentiment_service.get_comment_stats(db, start_date=start, end_date=end, search=search)
     return stats
 
@@ -48,6 +48,6 @@ async def get_trends(
     db: AsyncSession = Depends(get_db)
 ):
     """Returns daily breakdown for the Growth Analysis Bar chart"""
-    start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=timezone.utc) if start_date else None
-    end = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59, tzinfo=timezone.utc) if end_date else None
+    start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=timezone.utc) if (start_date and start_date.strip()) else None
+    end = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59, tzinfo=timezone.utc) if (end_date and end_date.strip()) else None
     return await sentiment_service.get_daily_trends(db, start_date=start, end_date=end, search=search)
