@@ -24,6 +24,8 @@ import Reports from '../components/dashboard/Reports.jsx';
 import Insights from '../components/dashboard/Insights.jsx';
 import Scan from '../components/dashboard/Scan.jsx';
 
+import API_BASE_URL from '../apiConfig';
+
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, PointElement,
   LineElement, ArcElement, Title, Tooltip, Legend, Filler
@@ -49,12 +51,22 @@ const Dashboard = () => {
   }, [navigate]);
 
   const fetchAnalytics = useCallback(async () => {
+    // Prevent fetching if dates are missing
+    if (!startDate || !endDate) return;
+
     setLoading(true);
     try {
       const response = await fetch(
-  `http://localhost:8000/analytics/dashboard?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`
-);
+        `${API_BASE_URL}/analytics/dashboard?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`
+      );
       const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("Dashboard analytics error:", data.detail);
+        setAnalytics(null);
+        return;
+      }
+
       setAnalytics(data);
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -80,7 +92,7 @@ const Dashboard = () => {
   const sentimentData = {
     labels: ['Positive', 'Negative', 'Neutral'],
     datasets: [{ 
-      data: analytics ? [analytics.sentiment.positive, analytics.sentiment.negative, analytics.sentiment.neutral] : [0,0,0], 
+      data: (analytics && analytics.sentiment) ? [analytics.sentiment.positive, analytics.sentiment.negative, analytics.sentiment.neutral] : [0,0,0], 
       backgroundColor: ['#10b981', '#ef4444', '#94a3b8'] 
     }]
   };

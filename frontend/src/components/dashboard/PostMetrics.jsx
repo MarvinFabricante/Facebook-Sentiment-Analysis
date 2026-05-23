@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, ThumbsUp, MessageSquare, Share2, FileText, Loader2, RefreshCw } from 'lucide-react';
+import API_BASE_URL from '../../apiConfig';
 
 const PostsMetrics = ({ startDate, endDate, searchTerm }) => {
   const [posts, setPosts] = useState([]);
@@ -19,7 +20,7 @@ const PostsMetrics = ({ startDate, endDate, searchTerm }) => {
     else setIsRefreshing(true);
 
     try {
-      const response = await fetch(`http://localhost:8000/posts/?start_date=${startDate}&end_date=${endDate}`);
+      const response = await fetch(`${API_BASE_URL}/posts/?start_date=${startDate}&end_date=${endDate}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setPosts(data);

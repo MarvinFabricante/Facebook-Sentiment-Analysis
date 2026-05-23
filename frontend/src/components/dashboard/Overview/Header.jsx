@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { LogOut, Bell, Search, Menu, X, MessageCircle, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../../apiConfig";
 
 const Header = ({ searchTerm, setSearchTerm }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -15,7 +16,7 @@ const Header = ({ searchTerm, setSearchTerm }) => {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:8000/analytics/notifications');
+      const response = await fetch(`${API_BASE_URL}/analytics/notifications`);
       if (response.ok) {
         const data = await response.json();
         setNotifications(data);

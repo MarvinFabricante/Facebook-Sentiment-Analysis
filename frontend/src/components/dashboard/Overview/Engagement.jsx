@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { TrendingUp, ArrowUpRight, BarChart3, Zap, Loader2 } from 'lucide-react';
+import API_BASE_URL from '../../../apiConfig';
 import {
   Chart as ChartJS,
   LineElement,
@@ -31,8 +32,8 @@ const Engagement = ({ startDate, endDate, searchTerm }) => {
     const fetchData = async () => {
       try {
         const [sRes, tRes] = await Promise.all([
-          fetch(`http://localhost:8000/ml/stats?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`),
-          fetch(`http://localhost:8000/ml/trends?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`)
+          fetch(`${API_BASE_URL}/ml/stats?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`),
+          fetch(`${API_BASE_URL}/ml/trends?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`)
         ]);
         const sData = await sRes.json();
         const tData = await tRes.json();

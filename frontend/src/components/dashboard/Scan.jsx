@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ScanLine, Loader2, CheckCircle, AlertCircle, Trash2, MessageSquare, Layout } from "lucide-react";
+import API_BASE_URL from "../../apiConfig";
 
 const Scan = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -50,7 +51,7 @@ const Scan = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8000/ml/analyze", {
+      const response = await fetch(`${API_BASE_URL}/ml/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

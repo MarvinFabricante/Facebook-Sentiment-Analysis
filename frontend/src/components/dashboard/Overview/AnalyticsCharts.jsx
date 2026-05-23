@@ -22,6 +22,8 @@ ChartJS.register(
   Filler
 );
 
+import API_BASE_URL from '../../../apiConfig';
+
 const AnalyticsCharts = ({ startDate, endDate, searchTerm }) => {
   const [stats, setStats] = useState({
     total: 0,
@@ -37,7 +39,7 @@ const AnalyticsCharts = ({ startDate, endDate, searchTerm }) => {
     const fetchAnalytics = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:8000/ml/stats?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`);
+        const response = await fetch(`${API_BASE_URL}/ml/stats?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`);
         
         if (!response.ok) throw new Error('Failed to fetch stats');
         

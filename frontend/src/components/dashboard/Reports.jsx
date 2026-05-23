@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Download, Printer, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import API_BASE_URL from '../../apiConfig';
 
 const Reports = ({ startDate, endDate, searchTerm }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -13,17 +14,17 @@ const Reports = ({ startDate, endDate, searchTerm }) => {
   ];
 
   const handleExportCSV = () => {
-    window.location.href = `http://localhost:8000/reports/export-csv?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`;
+    window.location.href = `${API_BASE_URL}/reports/export-csv?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`;
   };
 
   const handleViewPDF = () => {
-    window.open(`http://localhost:8000/reports/export-pdf?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`, '_blank');
+    window.open(`${API_BASE_URL}/reports/export-pdf?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`, '_blank');
   };
 
   const handleRefreshData = async () => {
     setIsRefreshing(true);
     try {
-      await fetch('http://localhost:8000/ml/stats');
+      await fetch(`${API_BASE_URL}/ml/stats`);
       setTimeout(() => setIsRefreshing(false), 800);
     } catch (err) {
       console.error("Refresh failed", err);

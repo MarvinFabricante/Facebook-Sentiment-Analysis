@@ -1,12 +1,13 @@
 import React from 'react';
 import { FileText, ThumbsUp, MessageSquare, Share2 } from 'lucide-react';
+import API_BASE_URL from '../../../apiConfig';
 
 const Stats = ({ startDate, endDate, searchTerm }) => {
   const [stats, setStats] = React.useState(null);
 
   React.useEffect(() => {
     setStats(null); // Trigger loading state
-    fetch(`http://localhost:8000/ml/stats?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`)
+    fetch(`${API_BASE_URL}/ml/stats?start_date=${startDate}&end_date=${endDate}&search=${searchTerm}`)
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(err => console.error("Failed to fetch stats:", err));
